@@ -1,8 +1,8 @@
-# Design: EDORA - Niche-Aware AI Video Editing Agent
+# Design: EDORA - Purpose-Aware AI Video Editing Agent
 
 ## Overview
 
-EDORA is a transcript-first video editing system that automates post-production based on audience niche. The architecture separates AI decision-making from tool execution, enabling scalable editing workflows through a linear pipeline: upload → transcription → niche selection → AI analysis → execution → export.
+EDORA is a transcript-first video editing system that removes editing friction for first-time creators by automatically transforming raw recordings into purpose-aware, structured videos. The architecture separates AI decision-making from tool execution, enabling scalable editing workflows through a linear pipeline: upload → transcription → purpose selection → AI analysis → execution → export.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ graph TB
     subgraph "Frontend Layer"
         UI[Web UI]
         Upload[Upload Component]
-        NicheSelector[Niche Selector]
+        PurposeSelector[Purpose Selector]
         Preview[Preview Component]
         Export[Export Component]
     end
@@ -43,7 +43,7 @@ graph TB
     
     UI --> API
     Upload --> VideoStore
-    NicheSelector --> SessionMgr
+    PurposeSelector --> SessionMgr
     Preview --> VideoStore
     Export --> VideoStore
     
@@ -72,7 +72,7 @@ graph TB
 - **Transcript-First**: All editing decisions derive from transcript analysis
 - **Stateless Processing**: Each pipeline stage can be retried independently
 - **Linear Workflow**: Single clear path from upload to export
-- **Niche-Driven**: All AI decisions parameterized by audience niche
+- **Purpose-Driven**: All AI decisions parameterized by content purpose
 - **Modular Components**: Independent development, testing, and scaling
 
 ## Components and Interfaces
@@ -86,7 +86,7 @@ Renders the linear workflow interface and manages client-side state.
 **Key Screens:**
 - Upload: Drag-and-drop with format validation
 - Processing: Transcript generation progress
-- Niche Selection: Four niche cards with descriptions
+- Purpose Selection: Three purpose cards with descriptions
 - Analysis: AI processing status
 - Preview: Video preview with edit summary
 - Export: Download and completion
@@ -106,13 +106,13 @@ interface WebUI {
   displayError(error: ErrorInfo): void
   
   // User actions
-  onNicheSelected(niche: NicheType): void
+  onPurposeSelected(purpose: PurposeType): void
   onExportRequested(): void
 }
 
-type ScreenType = 'upload' | 'processing' | 'niche' | 'analysis' | 'preview' | 'export'
+type ScreenType = 'upload' | 'processing' | 'purpose' | 'analysis' | 'preview' | 'export'
 type WorkflowStage = 'uploading' | 'transcribing' | 'analyzing' | 'editing' | 'exporting'
-type NicheType = 'student' | 'creator' | 'educator' | 'bharat'
+type PurposeType = 'progress-journal' | 'starter-vlog' | 'habit-tracker'
 ```
 
 #### 2. Upload Component
@@ -144,22 +144,22 @@ interface UploadResult {
 }
 ```
 
-#### 3. Niche Selector Component
+#### 3. Purpose Selector Component
 
-Displays four niche options and handles selection.
+Displays three purpose options and handles selection.
 
 **Interface:**
 ```typescript
-interface NicheSelectorComponent {
-  niches: NicheOption[]
-  selectedNiche: NicheType | null
+interface PurposeSelectorComponent {
+  purposes: PurposeOption[]
+  selectedPurpose: PurposeType | null
   
-  onNicheClick(niche: NicheType): void
+  onPurposeClick(purpose: PurposeType): void
   confirmSelection(): void
 }
 
-interface NicheOption {
-  type: NicheType
+interface PurposeOption {
+  type: PurposeType
   title: string
   description: string
   editingBehavior: string[]
@@ -207,8 +207,8 @@ interface APIGateway {
   GET /api/sessions/:id/transcript: TranscriptResponse
   POST /api/sessions/:id/transcript/generate: JobResponse
   
-  // Niche selection
-  POST /api/sessions/:id/niche(niche: NicheType): SessionResponse
+  // Purpose selection
+  POST /api/sessions/:id/purpose(purpose: PurposeType): SessionResponse
   
   // AI analysis
   POST /api/sessions/:id/analyze: JobResponse
@@ -241,7 +241,7 @@ interface Session {
   id: string
   videoId: string
   state: SessionState
-  niche: NicheType | null
+  purpose: PurposeType | null
   transcriptId: string | null
   editPlanId: string | null
   finalVideoId: string | null
@@ -252,7 +252,7 @@ interface Session {
 type SessionState = 
   | 'uploaded'
   | 'transcribing'
-  | 'awaiting_niche'
+  | 'awaiting_purpose'
   | 'analyzing'
   | 'editing'
   | 'completed'
@@ -320,19 +320,19 @@ Analyzes transcripts, detects highlights and filler, determines pacing and segme
 **Interface:**
 ```typescript
 interface AIDecisionEngine {
-  analyzeTranscript(transcriptId: string, niche: NicheType): Promise<EditPlan>
-  detectHighlights(transcript: Transcript, niche: NicheType): Highlight[]
-  detectFillerContent(transcript: Transcript, niche: NicheType): FillerSegment[]
-  determineSegments(transcript: Transcript, niche: NicheType): Segment[]
-  determinePacing(segments: Segment[], niche: NicheType): PacingDecision[]
-  generateCaptions(transcript: Transcript, niche: NicheType): Caption[]
+  analyzeTranscript(transcriptId: string, purpose: PurposeType): Promise<EditPlan>
+  detectHighlights(transcript: Transcript, purpose: PurposeType): Highlight[]
+  detectFillerContent(transcript: Transcript, purpose: PurposeType): FillerSegment[]
+  determineSegments(transcript: Transcript, purpose: PurposeType): Segment[]
+  determinePacing(segments: Segment[], purpose: PurposeType): PacingDecision[]
+  generateCaptions(transcript: Transcript, purpose: PurposeType): Caption[]
 }
 
 interface EditPlan {
   id: string
   sessionId: string
   transcriptId: string
-  niche: NicheType
+  purpose: PurposeType
   cuts: Cut[]
   segments: Segment[]
   highlights: Highlight[]
@@ -416,13 +416,13 @@ interface Video {
 }
 ```
 
-### Niche Configuration
+### Purpose Profile Configuration
 
-Each niche has specific parameters that control AI decision-making:
+Each purpose has specific parameters that control AI decision-making:
 
 ```typescript
-interface NicheConfig {
-  type: NicheType
+interface PurposeProfile {
+  type: PurposeType
   
   // Highlight detection
   highlightCriteria: {
@@ -460,106 +460,16 @@ interface NicheConfig {
 }
 ```
 
-**Niche-Specific Configurations:**
+**Purpose-Specific Configurations:**
 
 ```typescript
-const NICHE_CONFIGS: Record<NicheType, NicheConfig> = {
-  student: {
-    type: 'student',
+const PURPOSE_PROFILES: Record<PurposeType, PurposeProfile> = {
+  'progress-journal': {
+    type: 'progress-journal',
     highlightCriteria: {
-      priorityKeywords: ['definition', 'means', 'example', 'important', 'key concept'],
-      minSegmentLength: 10,
-      maxSegmentLength: 30,
-      hookWindowStart: 0,
-      hookWindowEnd: 60
-    },
-    fillerRemoval: {
-      maxSilenceDuration: 2.0,
-      removeFillerWords: true,
-      aggressiveness: 'medium'
-    },
-    pacing: {
-      targetSegmentDuration: { min: 15, max: 30 },
-      allowSpeedAdjustment: false,
-      preferredCutStyle: 'smooth'
-    },
-    captionStyle: {
-      fontSize: 24,
-      fontWeight: 'normal',
-      color: '#FFFFFF',
-      backgroundColor: '#000000',
-      position: 'bottom',
-      wordsPerCaption: 8,
-      minDisplayDuration: 2000
-    }
-  },
-  
-  creator: {
-    type: 'creator',
-    highlightCriteria: {
-      priorityKeywords: ['amazing', 'incredible', 'check this out', 'watch', 'look'],
-      minSegmentLength: 2,
-      maxSegmentLength: 8,
-      hookWindowStart: 0,
-      hookWindowEnd: 30
-    },
-    fillerRemoval: {
-      maxSilenceDuration: 1.0,
-      removeFillerWords: true,
-      aggressiveness: 'high'
-    },
-    pacing: {
-      targetSegmentDuration: { min: 3, max: 8 },
-      allowSpeedAdjustment: true,
-      preferredCutStyle: 'fast'
-    },
-    captionStyle: {
-      fontSize: 32,
-      fontWeight: 'bold',
-      color: '#FFFF00',
-      backgroundColor: '#000000',
-      position: 'center',
-      wordsPerCaption: 3,
-      minDisplayDuration: 800
-    }
-  },
-  
-  educator: {
-    type: 'educator',
-    highlightCriteria: {
-      priorityKeywords: ['therefore', 'because', 'this shows', 'we can see', 'conclusion'],
-      minSegmentLength: 20,
-      maxSegmentLength: 60,
-      hookWindowStart: 0,
-      hookWindowEnd: 120
-    },
-    fillerRemoval: {
-      maxSilenceDuration: 3.0,
-      removeFillerWords: false,
-      aggressiveness: 'low'
-    },
-    pacing: {
-      targetSegmentDuration: { min: 30, max: 60 },
-      allowSpeedAdjustment: false,
-      preferredCutStyle: 'natural'
-    },
-    captionStyle: {
-      fontSize: 22,
-      fontWeight: 'normal',
-      color: '#FFFFFF',
-      backgroundColor: '#000000',
-      position: 'bottom',
-      wordsPerCaption: 12,
-      minDisplayDuration: 3000
-    }
-  },
-  
-  bharat: {
-    type: 'bharat',
-    highlightCriteria: {
-      priorityKeywords: ['simple', 'easy', 'clear', 'understand', 'basic'],
+      priorityKeywords: ['learned', 'realized', 'progress', 'insight', 'discovered', 'understand'],
       minSegmentLength: 8,
-      maxSegmentLength: 20,
+      maxSegmentLength: 25,
       hookWindowStart: 0,
       hookWindowEnd: 45
     },
@@ -569,18 +479,78 @@ const NICHE_CONFIGS: Record<NicheType, NicheConfig> = {
       aggressiveness: 'medium'
     },
     pacing: {
-      targetSegmentDuration: { min: 10, max: 20 },
+      targetSegmentDuration: { min: 10, max: 25 },
+      allowSpeedAdjustment: false,
+      preferredCutStyle: 'smooth'
+    },
+    captionStyle: {
+      fontSize: 24,
+      fontWeight: 'normal',
+      color: '#FFFFFF',
+      backgroundColor: '#000000',
+      position: 'bottom',
+      wordsPerCaption: 7,
+      minDisplayDuration: 2000
+    }
+  },
+  
+  'starter-vlog': {
+    type: 'starter-vlog',
+    highlightCriteria: {
+      priorityKeywords: ['amazing', 'incredible', 'check this out', 'look at', 'wow', 'exciting'],
+      minSegmentLength: 4,
+      maxSegmentLength: 12,
+      hookWindowStart: 0,
+      hookWindowEnd: 30
+    },
+    fillerRemoval: {
+      maxSilenceDuration: 1.0,
+      removeFillerWords: true,
+      aggressiveness: 'high'
+    },
+    pacing: {
+      targetSegmentDuration: { min: 5, max: 12 },
+      allowSpeedAdjustment: true,
+      preferredCutStyle: 'fast'
+    },
+    captionStyle: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: '#FFFF00',
+      backgroundColor: '#000000',
+      position: 'center',
+      wordsPerCaption: 4,
+      minDisplayDuration: 1000
+    }
+  },
+  
+  'habit-tracker': {
+    type: 'habit-tracker',
+    highlightCriteria: {
+      priorityKeywords: ['completed', 'achieved', 'day', 'streak', 'goal', 'result', 'progress'],
+      minSegmentLength: 6,
+      maxSegmentLength: 15,
+      hookWindowStart: 0,
+      hookWindowEnd: 30
+    },
+    fillerRemoval: {
+      maxSilenceDuration: 1.5,
+      removeFillerWords: true,
+      aggressiveness: 'medium'
+    },
+    pacing: {
+      targetSegmentDuration: { min: 8, max: 15 },
       allowSpeedAdjustment: false,
       preferredCutStyle: 'smooth'
     },
     captionStyle: {
       fontSize: 28,
       fontWeight: 'bold',
-      color: '#FFFFFF',
+      color: '#00FF00',
       backgroundColor: '#000000',
       position: 'bottom',
-      wordsPerCaption: 6,
-      minDisplayDuration: 2500
+      wordsPerCaption: 5,
+      minDisplayDuration: 1500
     }
   }
 }
@@ -609,7 +579,7 @@ interface SessionData {
   editPlanId: string | null
   
   // User selections
-  selectedNiche: NicheType | null
+  selectedPurpose: PurposeType | null
   
   // Metadata
   createdAt: Date
@@ -666,8 +636,8 @@ interface EditPlanData {
   transcriptId: string
   
   // Configuration
-  niche: NicheType
-  nicheConfig: NicheConfig
+  purpose: PurposeType
+  purposeProfile: PurposeProfile
   
   // Decisions
   cuts: Cut[]
@@ -740,17 +710,17 @@ interface VideoMetadataData {
 *For any* video with speech content, all generated transcript word timestamps SHALL be accurate to within 100ms of actual speech timing.
 **Validates: Requirements 2.2**
 
-### Property 2: Niche-Specific Highlight Detection
-*For any* transcript and selected niche, all identified highlights SHALL match the niche's priority criteria (keywords, segment length, hook window).
-**Validates: Requirements 4.2, 4.3, 4.4, 4.5**
+### Property 2: Purpose-Specific Highlight Detection
+*For any* transcript and selected purpose, all identified highlights SHALL match the purpose's priority criteria (keywords, segment length, hook window).
+**Validates: Requirements 4.2, 4.3, 4.4**
 
 ### Property 3: Filler Removal Consistency
-*For any* transcript and niche configuration, all silence segments exceeding the niche's threshold SHALL be marked for removal.
-**Validates: Requirements 5.2, 5.3, 5.4, 5.5**
+*For any* transcript and purpose profile, all silence segments exceeding the purpose's threshold SHALL be marked for removal.
+**Validates: Requirements 5.2, 5.3, 5.4**
 
 ### Property 4: Pacing Conformance
-*For any* edit plan and niche, all segment durations SHALL fall within the niche's target pacing range.
-**Validates: Requirements 6.2, 6.3, 6.4, 6.5**
+*For any* edit plan and purpose, all segment durations SHALL fall within the purpose's target pacing range.
+**Validates: Requirements 6.2, 6.3, 6.4**
 
 ### Property 5: Caption Synchronization
 *For any* generated caption, the timestamp SHALL align with the source transcript word timing within 100ms.
@@ -765,14 +735,14 @@ interface VideoMetadataData {
 **Validates: Requirements 10.3, 11.4**
 
 ### Property 8: Session State Consistency
-*For any* session, the state transitions SHALL follow the defined workflow order: uploaded → transcribing → awaiting_niche → analyzing → editing → completed.
+*For any* session, the state transitions SHALL follow the defined workflow order: uploaded → transcribing → awaiting_purpose → analyzing → editing → completed.
 **Validates: Requirements 12.3**
 
 ## Error Handling
 
 - Upload validation: Format and size checks before processing
 - Transcription failures: Retry mechanism with user notification
-- AI analysis errors: Fallback to default niche behavior
+- AI analysis errors: Fallback to default purpose behavior
 - Edit execution failures: Preserve original video, allow retry
 - Session expiration: 24-hour cleanup with user warning
 - All errors logged with context for debugging

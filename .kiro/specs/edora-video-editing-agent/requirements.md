@@ -1,26 +1,27 @@
-# Requirements: EDORA - Niche-Aware AI Video Editing Agent
+# Requirements: EDORA - Purpose-Aware AI Video Editing Agent
 
 ## Introduction
 
-EDORA automates video editing decisions based on audience niche. Upload a video, select your target audience, and receive a professionally edited result—no timeline editing required. The AI analyzes transcripts to determine cuts, pacing, and captions optimized for your niche.
+EDORA removes editing friction for first-time creators by automatically transforming raw recordings into purpose-aware, structured videos. Upload a video, select your content purpose, and receive an edited result that supports consistent posting—no timeline editing required. The AI analyzes transcripts to determine cuts, pacing, and captions optimized for your purpose.
 
 ## Glossary
 
 - **EDORA_System**: The AI video editing agent
 - **Transcript_Service**: Generates timestamped transcripts from video audio
-- **AI_Decision_Engine**: Analyzes transcripts and creates niche-specific edit plans
+- **AI_Decision_Engine**: Analyzes transcripts and creates purpose-specific edit plans
 - **Edit_Executor**: Applies edit plans to video files
-- **Niche**: Target audience category (Student, Creator, Educator, Bharat Accessibility)
+- **Purpose**: Content creation goal (Progress Journal, Starter Vlog, Habit Tracker)
+- **Purpose_Profile**: Configuration defining editing behavior for a specific purpose
 - **Edit_Plan**: Structured editing decisions (cuts, pacing, captions)
 - **Segment**: Semantically meaningful video portion
 - **Filler_Content**: Removable speech patterns ("um", "uh", pauses, repetition)
-- **Highlight**: High-value content for the target niche
+- **Highlight**: High-value content for the selected purpose
 
 ## Requirements
 
 ### Requirement 1: Video Upload and Format Support
 
-**User Story:** As a content creator, I want to upload raw video files in common formats without conversion.
+**User Story:** As a first-time creator, I want to upload raw video files in common formats without conversion, so that I can start editing immediately.
 
 #### Acceptance Criteria
 
@@ -32,7 +33,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 2: Transcript Generation
 
-**User Story:** As a user, I want automatic timestamped transcripts for AI analysis.
+**User Story:** As a first-time creator, I want automatic timestamped transcripts for AI analysis, so that editing decisions are based on what I actually said.
 
 #### Acceptance Criteria
 
@@ -43,60 +44,57 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 5. IF transcription fails, THEN THE EDORA_System SHALL notify the user and allow retry
 6. THE Transcript_Service SHALL handle videos with no speech by generating an empty transcript
 
-### Requirement 3: Niche Selection
+### Requirement 3: Purpose Selection
 
-**User Story:** As a content creator, I want to select my target audience niche for optimized editing.
+**User Story:** As a first-time creator, I want to select my content purpose for optimized editing, so that my videos match my creation goals.
 
 #### Acceptance Criteria
 
-1. WHEN transcription completes, THE EDORA_System SHALL present niche selection
-2. THE EDORA_System SHALL offer four niches: Student/Learner, Creator/Short-Form, Educator/Explainer, Bharat Accessibility
-3. WHEN displaying niches, THE EDORA_System SHALL show clear descriptions of editing behavior
-4. THE EDORA_System SHALL require exactly one niche selection before proceeding
-5. WHEN a niche is selected, THE EDORA_System SHALL proceed to AI analysis
+1. WHEN transcription completes, THE EDORA_System SHALL present purpose selection
+2. THE EDORA_System SHALL offer three purposes: Progress Journal, Starter Vlog, Habit Tracker
+3. WHEN displaying purposes, THE EDORA_System SHALL show clear descriptions of editing behavior
+4. THE EDORA_System SHALL require exactly one purpose selection before proceeding
+5. WHEN a purpose is selected, THE EDORA_System SHALL proceed to AI analysis
 
 ### Requirement 4: AI Highlight Detection
 
-**User Story:** As a user, I want AI to identify the most engaging content for my audience.
+**User Story:** As a first-time creator, I want AI to identify the most engaging content for my purpose, so that my videos capture key moments without manual editing.
 
 #### Acceptance Criteria
 
-1. WHEN analyzing transcripts, THE AI_Decision_Engine SHALL identify highlights based on selected niche
-2. WHERE niche is Student/Learner, THE AI_Decision_Engine SHALL prioritize explanations, definitions, key concepts
-3. WHERE niche is Creator/Short-Form, THE AI_Decision_Engine SHALL prioritize high-energy hooks within first 30 seconds
-4. WHERE niche is Educator/Explainer, THE AI_Decision_Engine SHALL prioritize complete explanations and logical progressions
-5. WHERE niche is Bharat Accessibility, THE AI_Decision_Engine SHALL prioritize clear, simple language
-6. THE AI_Decision_Engine SHALL mark highlights with start and end timestamps
+1. WHEN analyzing transcripts, THE AI_Decision_Engine SHALL identify highlights based on selected purpose
+2. WHERE purpose is Progress Journal, THE AI_Decision_Engine SHALL prioritize learning moments, insights, and progress markers
+3. WHERE purpose is Starter Vlog, THE AI_Decision_Engine SHALL prioritize high-energy hooks within first 30 seconds and engaging moments
+4. WHERE purpose is Habit Tracker, THE AI_Decision_Engine SHALL prioritize action demonstrations, results, and consistency markers
+5. THE AI_Decision_Engine SHALL mark highlights with start and end timestamps
 
 ### Requirement 5: Filler Content Removal
 
-**User Story:** As a content creator, I want AI to remove pauses and filler words for professional results.
+**User Story:** As a first-time creator, I want AI to remove pauses and filler words for professional results, so that my videos feel polished without manual editing.
 
 #### Acceptance Criteria
 
 1. WHEN analyzing transcripts, THE AI_Decision_Engine SHALL identify filler content ("um", "uh", "like", silences)
-2. WHERE niche is Student/Learner, THE AI_Decision_Engine SHALL remove silences >2s and excessive filler words
-3. WHERE niche is Creator/Short-Form, THE AI_Decision_Engine SHALL aggressively remove silences >1s and all filler words
-4. WHERE niche is Educator/Explainer, THE AI_Decision_Engine SHALL preserve natural pauses, remove silences >3s
-5. WHERE niche is Bharat Accessibility, THE AI_Decision_Engine SHALL remove silences >2s while preserving speech rhythm
-6. THE AI_Decision_Engine SHALL mark filler segments with timestamps
+2. WHERE purpose is Progress Journal, THE AI_Decision_Engine SHALL remove silences >2s and excessive filler words
+3. WHERE purpose is Starter Vlog, THE AI_Decision_Engine SHALL aggressively remove silences >1s and all filler words
+4. WHERE purpose is Habit Tracker, THE AI_Decision_Engine SHALL remove silences >1.5s while preserving demonstration pacing
+5. THE AI_Decision_Engine SHALL mark filler segments with timestamps
 
-### Requirement 6: Niche-Aware Pacing
+### Requirement 6: Purpose-Aware Pacing
 
-**User Story:** As a user, I want AI to adjust pacing for my target audience's consumption speed.
+**User Story:** As a first-time creator, I want AI to adjust pacing for my content purpose, so that my videos maintain appropriate rhythm for consistent posting.
 
 #### Acceptance Criteria
 
-1. WHEN generating Edit_Plans, THE AI_Decision_Engine SHALL determine pacing based on niche
-2. WHERE niche is Student/Learner, THE AI_Decision_Engine SHALL maintain slower pacing (15-30s segments)
-3. WHERE niche is Creator/Short-Form, THE AI_Decision_Engine SHALL create fast pacing (3-8s segments)
-4. WHERE niche is Educator/Explainer, THE AI_Decision_Engine SHALL allow longer segments (30-60s)
-5. WHERE niche is Bharat Accessibility, THE AI_Decision_Engine SHALL maintain moderate pacing (10-20s segments)
-6. THE AI_Decision_Engine SHALL include pacing metadata in Edit_Plans
+1. WHEN generating Edit_Plans, THE AI_Decision_Engine SHALL determine pacing based on purpose
+2. WHERE purpose is Progress Journal, THE AI_Decision_Engine SHALL maintain moderate pacing (10-25s segments)
+3. WHERE purpose is Starter Vlog, THE AI_Decision_Engine SHALL create fast pacing (5-12s segments)
+4. WHERE purpose is Habit Tracker, THE AI_Decision_Engine SHALL maintain action-focused pacing (8-15s segments)
+5. THE AI_Decision_Engine SHALL include pacing metadata in Edit_Plans
 
 ### Requirement 7: Semantic Segment Grouping
 
-**User Story:** As a user, I want AI to group related content for coherent flow.
+**User Story:** As a first-time creator, I want AI to group related content for coherent flow, so that my videos tell a clear story.
 
 #### Acceptance Criteria
 
@@ -104,26 +102,25 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 2. THE AI_Decision_Engine SHALL group consecutive sentences about the same topic into segments
 3. WHEN topic changes are detected, THE AI_Decision_Engine SHALL create new segment boundaries
 4. THE AI_Decision_Engine SHALL assign descriptive labels to segments
-5. WHERE niche is Educator/Explainer, THE AI_Decision_Engine SHALL preserve complete explanations within segments
+5. WHERE purpose is Progress Journal, THE AI_Decision_Engine SHALL preserve complete thoughts within segments
 6. THE Edit_Plan SHALL include segment boundaries with timestamps
 
 ### Requirement 8: Automatic Caption Generation
 
-**User Story:** As a content creator, I want automatic captions for accessibility and engagement.
+**User Story:** As a first-time creator, I want automatic captions for accessibility and engagement, so that my videos reach more viewers.
 
 #### Acceptance Criteria
 
 1. WHEN generating Edit_Plans, THE EDORA_System SHALL create captions from timestamped transcripts
 2. THE EDORA_System SHALL synchronize captions with video timestamps (±100ms accuracy)
-3. WHERE niche is Student/Learner, THE EDORA_System SHALL format captions with clear, readable text at moderate speed
-4. WHERE niche is Creator/Short-Form, THE EDORA_System SHALL format captions with bold, attention-grabbing text
-5. WHERE niche is Educator/Explainer, THE EDORA_System SHALL format captions with complete sentences
-6. WHERE niche is Bharat Accessibility, THE EDORA_System SHALL format captions with high contrast, large text
-7. THE Edit_Plan SHALL include caption text, timing, and formatting specifications
+3. WHERE purpose is Progress Journal, THE EDORA_System SHALL format captions with clear, readable text at moderate speed
+4. WHERE purpose is Starter Vlog, THE EDORA_System SHALL format captions with bold, attention-grabbing text
+5. WHERE purpose is Habit Tracker, THE EDORA_System SHALL format captions with action-focused, motivational text
+6. THE Edit_Plan SHALL include caption text, timing, and formatting specifications
 
 ### Requirement 9: Edit Plan Generation
 
-**User Story:** As a user, I want AI to generate a complete edit plan before processing.
+**User Story:** As a first-time creator, I want AI to generate a complete edit plan before processing, so that I understand what changes will be made.
 
 #### Acceptance Criteria
 
@@ -134,7 +131,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 10: Edit Execution
 
-**User Story:** As a user, I want automatic application of all editing decisions.
+**User Story:** As a first-time creator, I want automatic application of all editing decisions, so that I can get a finished video without manual work.
 
 #### Acceptance Criteria
 
@@ -146,7 +143,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 11: Video Export
 
-**User Story:** As a content creator, I want to download edited videos in ready-to-share format.
+**User Story:** As a first-time creator, I want to download edited videos in ready-to-share format, so that I can post consistently without additional processing.
 
 #### Acceptance Criteria
 
@@ -159,7 +156,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 12: Session Management
 
-**User Story:** As a user, I want independent editing sessions for multiple projects.
+**User Story:** As a first-time creator, I want independent editing sessions for multiple projects, so that I can work on different videos without confusion.
 
 #### Acceptance Criteria
 
@@ -172,7 +169,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 13: Error Handling
 
-**User Story:** As a user, I want clear feedback when errors occur.
+**User Story:** As a first-time creator, I want clear feedback when errors occur, so that I can resolve issues without technical knowledge.
 
 #### Acceptance Criteria
 
@@ -185,7 +182,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 14: Performance
 
-**User Story:** As a user, I want reliable processing within reasonable time.
+**User Story:** As a first-time creator, I want reliable processing within reasonable time, so that editing doesn't become a bottleneck to consistent posting.
 
 #### Acceptance Criteria
 
@@ -197,7 +194,7 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 ### Requirement 15: User Interface Simplicity
 
-**User Story:** As a new user, I want an intuitive interface requiring no training.
+**User Story:** As a first-time creator with no editing experience, I want an intuitive interface requiring no training, so that I can focus on creating content.
 
 #### Acceptance Criteria
 
@@ -205,14 +202,14 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 2. THE EDORA_System SHALL display one primary action button per workflow stage
 3. THE EDORA_System SHALL use plain language without technical jargon
 4. THE EDORA_System SHALL provide visual feedback for all actions within 200ms
-5. THE EDORA_System SHALL display helpful tooltips for niche options
+5. THE EDORA_System SHALL display helpful tooltips for purpose options
 6. THE EDORA_System SHALL require no more than 5 clicks from upload to export
 
 ## Constraints
 
 - Single video per session (2GB max)
 - Supported formats: MP4, MOV, AVI, MKV
-- Niche selection required before AI analysis
+- Purpose selection required before AI analysis
 - No manual timeline editing
 - No visual ML (facial detection, emotion analysis)
 - Transcript-first architecture
@@ -223,24 +220,24 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 1. Users have stable internet connections for video upload and download
 2. Uploaded videos contain spoken content in a supported language (initially English)
 3. Video quality is sufficient for speech recognition (clear audio)
-4. Users understand their target audience and can select the appropriate niche
+4. Users understand their content purpose and can select the appropriate profile
 5. The transcript service has access to a reliable speech-to-text API
 6. Video processing infrastructure can handle concurrent sessions
-7. Users are creating content for online distribution (YouTube, social media, etc.)
-8. The AI decision engine has been trained on niche-specific editing patterns
+7. Users are first-time creators seeking to post consistently on platforms like YouTube, Instagram, TikTok
+8. The AI decision engine has been configured with purpose-specific editing patterns
 
 ## MVP Scope
 
 **In Scope:**
 - Single video upload and processing
-- Four predefined niches with niche-specific editing
+- Three predefined purpose profiles with purpose-specific editing
 - Automatic transcript generation and AI analysis
 - Highlight detection, filler removal, pacing optimization
 - Automatic caption generation
 - MP4 export with simple linear workflow UI
 
 **Out of Scope:**
-- Batch processing, custom niches, manual timeline editing
+- Batch processing, custom purposes, manual timeline editing
 - Visual effects, transitions, multi-language support
 - Collaborative editing, team features, video hosting
 - Analytics, mobile app, real-time preview
@@ -251,6 +248,6 @@ EDORA automates video editing decisions based on audience niche. Upload a video,
 
 - Complete workflow in <10 minutes for 5-minute videos
 - 80% first-attempt success rate
-- 70% positive feedback on AI editing decisions
+- 70% positive feedback on AI editing decisions from first-time creators
 - 95% processing reliability
-- Zero-training interface usability
+- Zero-training interface usability for users with no editing experience
